@@ -1,20 +1,30 @@
 package my.game.spinner;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
+import android.widget.Toast;
 import android.window.OnBackInvokedCallback;
 
 import androidx.annotation.Nullable;
+
+import java.util.Objects;
 
 import my.game.spinner.databinding.ActivityWelcomeBinding;
 
 public class WelcomeActivity extends FullscreenActivity {
 
     private ActivityWelcomeBinding binding;
+    private Handler backInvokedOnceResetHandler;
+    private boolean backInvokedOnce;
+
+    public WelcomeActivity() {
+        this.binding = null;
+        this.backInvokedOnce = false;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,16 +45,22 @@ public class WelcomeActivity extends FullscreenActivity {
     @Nullable
     @Override
     protected OnBackInvokedCallback createBackCallback() {
-        return () -> {
-            new AlertDialog.Builder(WelcomeActivity.this)
-                    .setTitle("Confirm")
-                    .setMessage("Are you sure you want to exit?")
-                    .setPositiveButton("Yes", (DialogInterface dialog, int which) -> {
-                        WelcomeActivity.this.finish();
-                        System.exit(0); // TODO: better way to exit?
-                    })
-                    .setNegativeButton("No", null)
-                    .show();
+        return  () -> {
+            if (WelcomeActivity.this.backInvokedOnce) {
+                OnBackInvokedCallback parentCallback = super.createBackCallback();
+                if (parentCallback != null) {
+                    parentCallback.onBackInvoked();
+                } else {
+                    WelcomeActivity.this.finish();
+                }
+                return;
+            }
+
+            WelcomeActivity.this.backInvokedOnce = true;
+            Toast.makeText(WelcomeActivity.this, "Back again to exit", Toast.LENGTH_SHORT).show();
+
+            WelcomeActivity.this.backInvokedOnceResetHandler = new Handler(Objects.requireNonNull(Looper.myLooper()));
+            WelcomeActivity.this.backInvokedOnceResetHandler.postDelayed(() -> WelcomeActivity.this.backInvokedOnce=false, 2000);
         };
     }
 }
