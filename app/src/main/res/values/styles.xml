@@ -1,0 +1,6 @@
+<resources>
+    <style name="AppTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar"> </style>
+    <!--<style name="Widget.Theme.Spinner.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>-->
+</resources>
